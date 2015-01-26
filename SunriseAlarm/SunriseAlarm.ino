@@ -28,7 +28,7 @@ int alarmDuration = 255; //seconds
 
 int buttonState = 0;
 long alarmSteps = 64;
-long alarmDurationSeconds = 1800;
+long alarmDurationSeconds = 10;
 AlarmId myTimer;
 
 void setup(){
@@ -52,18 +52,15 @@ void setup(){
 
 void loop(){
   Alarm.delay(1000);
-  if(alarmSet == 0){
-    digitalWrite(PIN13, 0);
-  }else{
-    digitalWrite(PIN13, 1);
+  if(alarmSet == 1){
+    digitalWrite(PIN13,0);
   }
+  else{
+    digitalWrite(PIN13,1);
+  }
+  
   while (Genotronex.available() > 0){
     Alarm.delay(1000);
-      if(alarmSet == 0){
-    digitalWrite(PIN13, 0);
-  }else{
-    digitalWrite(PIN13, 1);
-  }
     int command = Serial.parseInt();
     
     switch (command){
@@ -134,7 +131,6 @@ void getTime(){
 
 //command 3
 void setArduinoAlarm(int hour, int minute, int second){
-  alarmSet = 1;
   Alarm.alarmRepeat(hour, minute, second, alarm);
   Serial.println(hour);
   Serial.println(minute);
@@ -194,7 +190,6 @@ void alarm(){
   for(int i = 0; i<64; i++){
     buttonState = digitalRead(BUTTON);
     if(buttonState == 0){
-      alarmSet = 0;
       buzz();
       break;
     }
@@ -209,7 +204,6 @@ void alarm(){
   while(true){
     buttonState = digitalRead(BUTTON);
     if(buttonState == 0){
-      alarmSet = 0;
       break;
     }
     else{
