@@ -166,6 +166,16 @@ void buzz(){
   Serial.println("buzzed");
 }
 
+
+//void pin2ISR(){
+//  disableAlarm();
+//  Genotronex.println("Alarm Disabled");
+//}
+//void pin3ISR(){
+//  enableAlarm();
+//  Serial.println("Alarm Enabled");
+//}
+
 //cmd 14
 void alarm(){
 //this is the actual function that runs when the alarm goes off
@@ -184,7 +194,7 @@ void alarm(){
       break;
     }
     else{
-      redVal = map(lookup[i], 0, 1023, 0, 255);
+      redVal = map(lookup[i], 0, 1023, 0, 255);//5/alarmDuration;
       LEDs(redVal,redVal,redVal);
       delay(delayValue);
     }
@@ -202,6 +212,13 @@ void alarm(){
     }
   }
 }
+//  
+//  Serial.println("buzzing");
+//  for (i=0; i<5; i++){
+//    buzz();
+//  }
+//  Serial.println("buzzingover");
+//}
 
 void digitalClockDisplay()
 {
