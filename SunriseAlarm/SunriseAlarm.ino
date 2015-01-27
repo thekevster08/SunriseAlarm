@@ -1,8 +1,7 @@
+//THIS IS THE MASTER
 #include <Time.h>
 #include <TimeAlarms.h>
 #include <SoftwareSerial.h>
-
-//branch 
 
 const int BUZZER = 3;
 const int BLUE = 9;
