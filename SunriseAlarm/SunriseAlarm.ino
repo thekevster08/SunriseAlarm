@@ -1,4 +1,3 @@
- 
 #include <Time.h>
 #include <TimeAlarms.h>
 #include <SoftwareSerial.h>
@@ -8,7 +7,8 @@ const int BLUE = 9;
 const int GREEN = 10;
 const int RED = 11;  
 const int PIN13 = 13;
-const int BUTTON = 2;
+const int RESET_BUTTON = 2;
+const int OFF_BUTTON = 4;
 
 int lookup[64] = {1,2,4,6,9,12,16,20,25,30,36,
 42,49,56,64,72,81,90,100,110,121,132,
@@ -26,16 +26,22 @@ int alarmSecond = 0;
 int alarmSet = 0;
 int alarmDuration = 255; //seconds
 
-int buttonState = 0;
+int offButtonState = 0;
+int resetButtonState = 0;
+
 long alarmSteps = 64;
 long alarmDurationSeconds = 10;
 AlarmId myTimer;
 
+int lastHour = 0;
+int lastMinute = 0;
+int lastSecond = 0;
+
 void setup(){
   buzz();
   
-  Genotronex.begin(9600);
-  Genotronex.println("Bluetooth On");
+//  Genotronex.begin(9600);
+//  Genotronex.println("Bluetooth On");
   Serial.begin(9600);
   Serial.println("serial on");
   
@@ -43,26 +49,36 @@ void setup(){
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
   pinMode(PIN13, OUTPUT);
-  pinMode(BUTTON, INPUT);
- // LEDs(0,0,0);
-  setTime(18,45,30,1,12,15); // set time to Saturday 8:29:00am Jan 1 2011
-  //myTimer = Alarm.timerRepeat(5, alarm);
-  setArduinoAlarm(18,45,35);
+  pinMode(OFF_BUTTON, INPUT);
+ 
+  setTime(18,45,30,1,12,15); 
+ // setArduinoAlarm(18,45,35);
 }
 
 void loop(){
   Alarm.delay(1000);
-  if(alarmSet == 1){
+  if(alarmSet == 0){
     digitalWrite(PIN13,0);
   }
   else{
     digitalWrite(PIN13,1);
   }
-  
-  while (Genotronex.available() > 0){
-    Alarm.delay(1000);
+  resetButtonState = digitalRead(RESET_BUTTON);
+  Serial.println(resetButtonState);
+  if(resetButtonState == 1){
+	setArduinoAlarm(lastHour, lastMinute, lastSecond);
+  }
+  //while (Genotronex.available() > 0){
+  while(Serial.available() > 0){  
+  resetButtonState = digitalRead(RESET_BUTTON);
+  Serial.println(resetButtonState);
+  if(resetButtonState == 1){
+	setArduinoAlarm(lastHour, lastMinute, lastSecond);
+  }   
+  Serial.println(resetButtonState);
+  Alarm.delay(1000);
     int command = Serial.parseInt();
-    
+
     switch (command){
       case 1:
         setArduinoTime(Serial.parseInt(),Serial.parseInt(),Serial.parseInt(),Serial.parseInt(),Serial.parseInt(),Serial.parseInt());
@@ -77,12 +93,12 @@ void loop(){
         alarmMinute = Serial.parseInt();
         alarmSecond = Serial.parseInt();
         setArduinoAlarm(alarmHour, alarmMinute, alarmSecond);
-        Serial.println("Alarm Set to:");
+        Serial.print("Alarm Set to: ");
         Serial.print(alarmHour);
         Serial.print(", ");
         Serial.print(alarmMinute);
         Serial.print(", ");
-        Serial.print(alarmSecond);
+        Serial.println(alarmSecond);
         break;
       case 4:
         getAlarm();
@@ -93,27 +109,24 @@ void loop(){
       case 6:
         disableAlarm();
         break;
-	  /* Debug Commands*/
+	  /** Debug Commands
+		The following are commands not used in final code, but are helpful for debugging
+	  */
       case 13:
-	buzz();
-	break;
+		buzz();
+		break;
       case 14:
-        Serial.println("data sent");
-	alarm();
+		alarm();
 	break;
       case 15:
-        int LEDred = Genotronex.parseInt();
-        int LEDgreen = Genotronex.parseInt();
-        int LEDblue = Genotronex.parseInt();
+        int LEDred = Serial.parseInt();
+        int LEDgreen = Serial.parseInt();
+        int LEDblue = Serial.parseInt();
         LEDs(LEDred, LEDgreen, LEDblue);
         break;
     }
   }
 }
-//void OnceOnly(){
-//  Serial.println("This timer only triggers once");  
-//}
-
 
 /*Serial Commands
 *************************************************
@@ -131,32 +144,46 @@ void getTime(){
 
 //command 3
 void setArduinoAlarm(int hour, int minute, int second){
+  lastHour = hour;
+  lastMinute = minute;
+  lastSecond = second;
+  
   Alarm.alarmRepeat(hour, minute, second, alarm);
+  
+  alarmSet = 1;
+  
   Serial.println(hour);
   Serial.println(minute);
   Serial.println(second);  
 }
 
-//command 4
+/**
+	command 4
+	Prints the last alarm to serial
+*/
 void getAlarm(){
-  Serial.print("Alarm Set to:");
+  Serial.print("Last Known Alarm:");
   Serial.print(alarmHour);
   Serial.print(", ");
   Serial.print(alarmMinute);
   Serial.print(", ");
-  Serial.print(alarmSecond);
+  Serial.println(alarmSecond);
 }
 
-//command 5
-void enableAlarm(){
+/**
+	command 5
+	Enables the arduino alarm
+*/
+void enableAlarm(){  
   Alarm.enable(myTimer);
+  Serial.println("Alarm Enabled");
 }
 
 //command 6
 void disableAlarm(){
   Alarm.disable(myTimer);
+  Serial.println("Alarm Disabled");
 }
-
 
 //command 13
 void buzz(){
@@ -165,16 +192,6 @@ void buzz(){
   noTone(BUZZER);
   Serial.println("buzzed");
 }
-
-
-//void pin2ISR(){
-//  disableAlarm();
-//  Genotronex.println("Alarm Disabled");
-//}
-//void pin3ISR(){
-//  enableAlarm();
-//  Serial.println("Alarm Enabled");
-//}
 
 //cmd 14
 void alarm(){
@@ -188,13 +205,13 @@ void alarm(){
   Serial.println(alarmSteps);
   Serial.println(delayValue);
   for(int i = 0; i<64; i++){
-    buttonState = digitalRead(BUTTON);
-    if(buttonState == 0){
+    offButtonState = digitalRead(OFF_BUTTON);
+    if(offButtonState == 0){
       buzz();
       break;
     }
     else{
-      redVal = map(lookup[i], 0, 1023, 0, 255);//5/alarmDuration;
+      redVal = map(lookup[i], 0, 1023, 0, 255);
       LEDs(redVal,redVal,redVal);
       delay(delayValue);
     }
@@ -202,8 +219,9 @@ void alarm(){
   LEDs(redVal,0,0);
   Serial.println("alarmed");
   while(true){
-    buttonState = digitalRead(BUTTON);
-    if(buttonState == 0){
+    offButtonState = digitalRead(OFF_BUTTON);
+    if(offButtonState == 0){
+	  alarmSet = 0;
       break;
     }
     else{
@@ -212,23 +230,19 @@ void alarm(){
     }
   }
 }
-//  
-//  Serial.println("buzzing");
-//  for (i=0; i<5; i++){
-//    buzz();
-//  }
-//  Serial.println("buzzingover");
-//}
-
+/**
+	Helper function to print the time to serial
+*/
 void digitalClockDisplay()
 {
-  // digital clock display of the time
   Serial.print(hour());
   printDigits(minute());
   printDigits(second());
   Serial.println(); 
 }
-
+/**
+	Helper function to print digits 
+*/
 void printDigits(int digits)
 {
   Serial.print(":");
@@ -237,6 +251,9 @@ void printDigits(int digits)
   Serial.print(digits);
 }
 
+/**
+	Helper function to write frequencies to LEDs
+*/
 void LEDs(int red, int green, int blue){
   analogWrite(RED, red);
   analogWrite(GREEN, green);
