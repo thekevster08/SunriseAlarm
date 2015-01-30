@@ -7,7 +7,6 @@ const int BLUE = 9;
 const int GREEN = 10;
 const int RED = 11;  
 const int PIN13 = 13;
-const int RESET_BUTTON = 2;
 const int OFF_BUTTON = 4;
 
 int lookup[64] = {1,2,4,6,9,12,16,20,25,30,36,
@@ -27,7 +26,6 @@ int alarmSet = 0;
 int alarmDuration = 255; //seconds
 
 int offButtonState = 0;
-int resetButtonState = 0;
 
 long alarmSteps = 64;
 long alarmDurationSeconds = 10;
@@ -63,19 +61,10 @@ void loop(){
   else{
     digitalWrite(PIN13,1);
   }
-  resetButtonState = digitalRead(RESET_BUTTON);
-  Serial.println(resetButtonState);
-  if(resetButtonState == 1){
-	setArduinoAlarm(lastHour, lastMinute, lastSecond);
-  }
+
   //while (Genotronex.available() > 0){
   while(Serial.available() > 0){  
-  resetButtonState = digitalRead(RESET_BUTTON);
-  Serial.println(resetButtonState);
-  if(resetButtonState == 1){
-	setArduinoAlarm(lastHour, lastMinute, lastSecond);
-  }   
-  Serial.println(resetButtonState);
+
   Alarm.delay(1000);
     int command = Serial.parseInt();
 
