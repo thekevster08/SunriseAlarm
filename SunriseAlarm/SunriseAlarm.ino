@@ -28,7 +28,7 @@ int alarmDuration = 255; //seconds
 int offButtonState = 0;
 
 long alarmSteps = 64;
-long alarmDurationSeconds = 10;
+long alarmDurationSeconds = 22;
 AlarmId myTimer;
 
 int lastHour = 0;
