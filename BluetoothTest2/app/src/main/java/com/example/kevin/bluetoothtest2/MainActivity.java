@@ -1,24 +1,16 @@
 package com.example.kevin.bluetoothtest2;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
+
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -30,12 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.UUID;
 
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
-import android.app.Fragment;
+
 
 public class MainActivity extends FragmentActivity implements TimePickerDialog.OnTimeSetListener{
 
@@ -52,11 +41,7 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
     byte[] readBuffer = new byte[1024];
 
     TextView receivedMessage;
-    Button setAlarmButton, setTimeButton;
-    TimePicker timePicker;
-    private int hour;
-    private int minute;
-    private int second;
+    Button setAlarmButton, setTimeButton, getTimeButton, getAlarmButton, clearLogButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +50,28 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
         receivedMessage = (TextView) findViewById(R.id.receivedMessage);
         setAlarmButton = (Button) findViewById(R.id.setAlarmButton);
         setTimeButton = (Button) findViewById(R.id.setTimeButton);
+        getTimeButton = (Button) findViewById(R.id.getTimeButton);
+        getAlarmButton = (Button) findViewById(R.id.getAlarmButton);
+        clearLogButton = (Button) findViewById(R.id.clearLogButton);
+
+        setTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar c = Calendar.getInstance();
+
+                new TimePickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        receivedMessage.setText("Time: " + hourOfDay + " : " + minute);
+                        writeData("1, " + hourOfDay + ", " + minute +", 0, 1, 1, 1");
+                    }
+                },
+                        c.get(Calendar.HOUR_OF_DAY),
+                        c.get(Calendar.MINUTE),
+                        true).show();
+            }
+        });
 
         setAlarmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +83,7 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         receivedMessage.setText("Time: " + hourOfDay + " : " + minute);
+                        writeData("3, " + hourOfDay + ", " + minute +", 0");
                     }
                 },
                         c.get(Calendar.HOUR_OF_DAY),
@@ -83,17 +91,22 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
                         true).show();
             }
         });
-
-//https://github.com/Bootez/TimeDialog/blob/master/src/com/example/timedialog/MainActivity.java
-
-
-
-        setTimeButton.setOnClickListener(new View.OnClickListener() {
+        getAlarmButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                writeData("4");
+            }
+        });
+        getTimeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 writeData("2");
             }
         });
 
+        clearLogButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                receivedMessage.setText("---");
+            }
+        });
         CheckBt();
         Connect();
         writeData("13");
@@ -122,6 +135,18 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onTimeSet(TimePicker view, int hour, int minute)
+    {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, hour);
+        calendar.set(Calendar.MINUTE, minute);
+
+        Format formatter = new SimpleDateFormat("HH:mm:ss");
+        String s = formatter.format(calendar.getTime());
+
+    }
 
     private void CheckBt() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -138,7 +163,6 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
                     .show();
         }
     }
-
 
     public void Connect() { //ac:22:0b:3e:19:79 DD:17:36:C6:28:83
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("20:14:05:15:19:04");
@@ -179,7 +203,6 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
             Log.d(TAG, "Bug DURANT l'envoie.", e);
         }
     }
-
 
     public void beginListenForData()   {
         try {
@@ -243,22 +266,5 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
 
         workerThread.start();
     }
-
-    @Override
-    public void onTimeSet(TimePicker view, int hour, int minute)
-    {
-        this.hour = hour;
-        this.minute = minute;
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, hour);
-        calendar.set(Calendar.MINUTE, minute);
-
-        Format formatter = new SimpleDateFormat("HH:mm:ss");
-        String s = formatter.format(calendar.getTime());
-
-        receivedMessage.setText(s);
-    }
-
 
 }

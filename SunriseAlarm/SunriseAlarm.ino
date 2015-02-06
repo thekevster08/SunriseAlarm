@@ -83,6 +83,7 @@ void loop(){
         Serial.print(alarmMinute);
         Serial.print(", ");
         Serial.print(alarmSecond);
+		buzz();
         break;
       case 4:
         getAlarm();
