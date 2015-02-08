@@ -2,7 +2,7 @@
 #include <TimeAlarms.h>
 #include <SoftwareSerial.h>
 
-const int BUZZER = 3;
+const int BUZZER = 12;
 const int BLUE = 9;
 const int GREEN = 10;
 const int RED = 11;  
@@ -46,6 +46,15 @@ void setup(){
   pinMode(OFF_BUTTON, INPUT);
  
   setTime(12,0,0,1,1,15); 
+  
+  buzz();
+  LEDs(255,0,0);
+  delay(1000);
+  LEDs(0,255,0);
+  delay(1000);
+  LEDs(0,0,255);
+  delay(1000);
+  LEDs(255,255,255);
 }
 
 void loop(){
