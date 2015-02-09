@@ -16,6 +16,12 @@ int lookup[64] = {1,2,4,6,9,12,16,20,25,30,36,
 529,552,576,600,625,650,676,702,729,756,784,
 812,841,870,900,930,961,992,992,992};
 
+int lookupRed[64] = {0,0,0,0,0,0,1,2,4,6,9,12,16,20,25,30,36,42,49,56,64,72,81,90,100,110,121,132,144,156,169,182,196,210,225,240,256,272,289,316,324,342,361,380,400,420,441,462,484,506,529,552,576,600,784,812,841,870,900,930,961,992,992,992};
+
+int lookupGreen[64] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,20,100,150,200,250,300,350,400,450,500,550,600,650,700,750,800,850,900,992,992,992};
+
+int lookupBlue[64] = {1,2,4,6,9,12,16,20,25,30,36,42,49,56,64,72,81,90,100,110,121,132,144,156,169,182,196,210,225,240,256,272,289,316,324,342,361,380,400,420,441,462,484,506,529,552,576,600,600,600,600,550,500,450,400,350,300,300,300,300,300,300,300,300};
+
 SoftwareSerial Genotronex(0, 1);
 
 int alarmHour = 0;
@@ -23,7 +29,7 @@ int alarmMinute = 0;
 int alarmSecond = 0;
 
 int alarmSet = 0;
-int alarmDuration = 255; //seconds
+int alarmDuration = 10; //seconds
 
 int offButtonState = 0;
 
@@ -55,6 +61,10 @@ void setup(){
   LEDs(0,0,255);
   delay(1000);
   LEDs(255,255,255);
+  delay(1000);
+  LEDs(0,0,0);
+  
+  alarm();
 }
 
 void loop(){
@@ -203,17 +213,20 @@ void alarm(){
       break;
     }
     else{
-      redVal = map(lookup[i], 0, 1023, 0, 255);
-      LEDs(redVal,redVal,redVal);
+      redVal = map(lookupRed[i], 0, 1023, 0, 255);
+	  greenVal = map(lookupGreen[i], 0, 1023, 0, 255);
+	  blueVal = map(lookupBlue[i], 0, 1023, 0, 255);
+	  LEDs(redVal,greenVal,blueVal);
       delay(delayValue);
     }
   }
-  LEDs(redVal,0,0);
+  LEDs(redVal,greenVal,blueVal);
   Serial.println("alarmed");
   for(int i = 0; i<5; i++){
     offButtonState = digitalRead(OFF_BUTTON);
     if(offButtonState == 0){
 	  alarmSet = 0;
+	  LEDs(0,0,0);
       break;
     }
     else{
