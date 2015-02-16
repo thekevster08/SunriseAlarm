@@ -3,11 +3,10 @@
 #include <SoftwareSerial.h>
 
 const int BUZZER = 12;
-const int BLUE = 9;
+const int BLUE = 11;
 const int GREEN = 10;
-const int RED = 11;  
-const int PIN13 = 13;
-const int OFF_BUTTON = 4;
+const int RED = 9;  
+const int OFF_BUTTON = 13;
 
 int lookup[64] = {1,2,4,6,9,12,16,20,25,30,36,
 42,49,56,64,72,81,90,100,110,121,132,
@@ -29,12 +28,12 @@ int alarmMinute = 0;
 int alarmSecond = 0;
 
 int alarmSet = 0;
-int alarmDuration = 10; //seconds
+int alarmDuration = 3; //seconds
 
 int offButtonState = 0;
 
 long alarmSteps = 64;
-long alarmDurationSeconds = 22;
+long alarmDurationSeconds = 60*30;
 AlarmId myTimer;
 
 void setup(){
@@ -48,11 +47,10 @@ void setup(){
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
-  pinMode(PIN13, OUTPUT);
   pinMode(OFF_BUTTON, INPUT);
  
   setTime(12,0,0,1,1,15); 
-  
+//  setArduinoAlarm(12,0,1);
   buzz();
   LEDs(255,0,0);
   delay(1000);
@@ -64,16 +62,16 @@ void setup(){
   delay(1000);
   LEDs(0,0,0);
   
-  alarm();
+ // alarm();
 }
 
 void loop(){
   Alarm.delay(1000);
   if(alarmSet == 0){
-    digitalWrite(PIN13,0);
+  //  digitalWrite(PIN13,0);
   }
   else{
-    digitalWrite(PIN13,1);
+  //  digitalWrite(PIN13,1);
   }
 
   //while (Genotronex.available() > 0){
@@ -206,7 +204,7 @@ void alarm(){
   Serial.println(alarmDurationSeconds*1000);
   Serial.println(alarmSteps);
   Serial.println(delayValue);
-  for(int i = 0; i<64; i++){
+  for(int i = 0; i<63; i++){
     offButtonState = digitalRead(OFF_BUTTON);
     if(offButtonState == 0){
       buzz();
@@ -220,9 +218,24 @@ void alarm(){
       delay(delayValue);
     }
   }
-  LEDs(redVal,greenVal,blueVal);
   Serial.println("alarmed");
-  for(int i = 0; i<5; i++){
+  //delay(1000);
+  //LEDs(0,0,0);
+ // delay(1000);
+//  LEDs(220,30,30);
+ // delay(1000);
+ // LEDs(255,0,0);
+ // delay(1000);
+ // LEDs(0,255,0);
+ // delay(1000);
+ // LEDs(0,0,255);
+  delay(1000);
+  LEDs(255,255,255);
+  delay(1000);
+  LEDs(map(992, 0, 1023, 0, 255),map(992, 0, 1023, 0, 255),map(300, 0, 1023, 0, 255));
+  delay(1000);
+
+  for(int j = 0; j<5; j++){
     offButtonState = digitalRead(OFF_BUTTON);
     if(offButtonState == 0){
 	  alarmSet = 0;
