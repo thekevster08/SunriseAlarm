@@ -1,4 +1,4 @@
-//branched
+//merge
 #ifndef SunriseAlarm_h
 #define SunriseAlarm_h
 
