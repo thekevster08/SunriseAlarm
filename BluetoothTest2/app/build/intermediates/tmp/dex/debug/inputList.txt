@@ -1,0 +1,5 @@
+C:\Users\Kevin\Documents\GitHub\SunriseAlarm\BluetoothTest2\app\build\intermediates\classes\debug
+C:\Users\Kevin\Documents\GitHub\SunriseAlarm\BluetoothTest2\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.3-d25339f75e31e492613f8a2b956c47944efca2d1.jar
+C:\Users\Kevin\Documents\GitHub\SunriseAlarm\BluetoothTest2\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.3-608709bbae20f8d719d526b046f553e98b60b26d.jar
+C:\Users\Kevin\Documents\GitHub\SunriseAlarm\BluetoothTest2\app\build\intermediates\pre-dexed\debug\classes-9a031a9328ce413a148dabf46afca36e1a641a48.jar
+C:\Users\Kevin\Documents\GitHub\SunriseAlarm\BluetoothTest2\app\build\intermediates\pre-dexed\debug\classes-d6ff94f67ef3236fc5d6d97e2cd7df97e0512113.jar

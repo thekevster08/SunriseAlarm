@@ -164,8 +164,8 @@ public class MainActivity extends FragmentActivity implements TimePickerDialog.O
         }
     }
 
-    public void Connect() { //board is 20:14:05:15:19:04
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("10:14:05:26:01:63");
+    public void Connect() { //ac:22:0b:3e:19:79 DD:17:36:C6:28:83
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("20:14:05:15:19:04");
         Log.d("", "Connecting to ... " + device);
         mBluetoothAdapter.cancelDiscovery();
         try {

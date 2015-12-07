@@ -63,6 +63,12 @@ void setup(){
   LEDs(0,0,0);
   
  // alarm();
+  //pinMode(PIN13, OUTPUT);
+  pinMode(BUTTON, INPUT);
+ // LEDs(0,0,0);
+  setTime(18,45,30,1,12,15); // set time to Saturday 8:29:00am Jan 1 2011
+  //myTimer = Alarm.timerRepeat(5, alarm);
+  setArduinoAlarm(18,45,35);
 }
 
 void loop(){
@@ -235,7 +241,7 @@ void alarm(){
   LEDs(map(992, 0, 1023, 0, 255),map(992, 0, 1023, 0, 255),map(300, 0, 1023, 0, 255));
   delay(1000);
 
-  for(int j = 0; j<5; j++){
+  for(int j = 0; j<50; j++){
     offButtonState = digitalRead(OFF_BUTTON);
     if(offButtonState == 0){
 	  alarmSet = 0;
